@@ -1,7 +1,10 @@
 $(document).ready(function() {
   makeCanvasFullPage();
-  loadInGradients();
+  loadInGradients("https://raw.githubusercontent.com/bellentuck/colors/master/gradients.json");
 });
+
+
+
 
 function makeCanvasFullPage() {
   var canvas = document.getElementById('canvas');
@@ -9,20 +12,14 @@ function makeCanvasFullPage() {
   canvas.height = window.innerHeight;
 }
 
-
-
-function loadInGradients() {
-  $.getJSON("https://raw.githubusercontent.com/bellentuck/colors/master/gradients.json", function(json) {
+function loadInGradients(url) {
+  $.getJSON(url, function(json) {
     var results = getResultColors(json);
-    console.log(results);
-    var colorsIdx = 0;
-    alert('test');
-    setInterval(function(){
-      colorsIdx++;
-      changeBackgroundGradient(results[colorsIdx]);
-    }, 5000);
+    dealWithColors(results);
   });
 }
+
+
 
 
 function getResultColors(data) {
@@ -40,58 +37,19 @@ function addColorsEntryToResults(result, colors) {
   return result;
 }
 
+function dealWithColors(data) {
+  var colorsIdx = 0;
+  setInterval(function(){
+    colorsIdx++;
+    changeBackgroundGradient(data[colorsIdx]);
+  }, 600);
+}
 
-// function changeBackgroundGradient(colorData) {
-//    document.body.style.background = 'linear-gradient(90deg, ' + colorData[0] + '10%, ' + colorData[1] + ' 90%)';
-// }
 function changeBackgroundGradient(colorData) {
-  var canvas = document.getElementById('canvas');
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  var ctx = canvas.getContext('2d');
-  var gradient = ctx.createLinearGradient(0, 0, canvas.height, canvas.width);
+  var ctx = document.getElementById('canvas').getContext('2d');
+  var gradient = ctx.createLinearGradient(0, 0, window.innerHeight, window.innerWidth);
   gradient.addColorStop(0, colorData[0]);
   gradient.addColorStop(1, colorData[1]);
   ctx.fillStyle = gradient;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-   //document.body.style.background = 'linear-gradient(90deg, ' + colorData[0] + '10%, ' + colorData[1] + ' 90%)';
+  ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
 }
-
-//
-//
-//
-//
-//
-
-
-//       var colorsIdx = 0;
-//       (function() {
-//         setInterval(function(){
-//           changeBackgroundGradient(data[colorsIdx]);
-//           alert('Loop Works');
-//           //alert(data[colorsIdx]);
-//         }, 1000);
-//       })();
-//       alert('hi once more');
-//       // alert(data[0]['name']);
-//   });
-// })();
-
-
-
-
-// function changeBackgroundGradient(colorData) {
-//    document.body.style.background = linear-gradient(90deg, colorData[0] 10%, colorData[1] 90%);
-// }
-
-// var data = readInData();
-// alert(data[0]);
-//--------------------------------------------//
-
-
-
-
-// // after some time, change body.background
-// background: linear-gradient(
-//   90deg, #EC6F66 10%, #F3A183 90%
-// ); /* W3C */
