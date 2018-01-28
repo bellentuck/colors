@@ -1,4 +1,17 @@
 $(document).ready(function() {
+  makeCanvasFullPage();
+  loadInGradients();
+});
+
+function makeCanvasFullPage() {
+  var canvas = document.getElementById('canvas');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+
+
+
+function loadInGradients() {
   $.getJSON("https://raw.githubusercontent.com/bellentuck/colors/master/gradients.json", function(json) {
     var results = getResultColors(json);
     console.log(results);
@@ -7,9 +20,10 @@ $(document).ready(function() {
     setInterval(function(){
       colorsIdx++;
       changeBackgroundGradient(results[colorsIdx]);
-    }, 1000);
+    }, 5000);
   });
-});
+}
+
 
 function getResultColors(data) {
   var result = [];
@@ -39,7 +53,7 @@ function changeBackgroundGradient(colorData) {
   gradient.addColorStop(0, colorData[0]);
   gradient.addColorStop(1, colorData[1]);
   ctx.fillStyle = gradient;
-  ctx.fillRect(10, 10, canvas.width, canvas.height);
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
    //document.body.style.background = 'linear-gradient(90deg, ' + colorData[0] + '10%, ' + colorData[1] + ' 90%)';
 }
 
