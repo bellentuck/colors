@@ -49,28 +49,6 @@ function dealWithColors(data) {
   window.addEventListener('keydown', keyActions(state), true);
 }
 
-function changeBackgroundGradient(colorData) {
-  var ctx = document.getElementById('canvas').getContext('2d');
-  var gradient = ctx.createLinearGradient(0, 0, window.innerHeight, window.innerWidth);
-  gradient.addColorStop(0, colorData[0]);
-  gradient.addColorStop(1, colorData[1]);
-  ctx.fillStyle = gradient;
-  ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
-}
-
-
-function changeBackgroundGradientRandomly(state) {
-  return function() {
-    state.idx = getRandomInt(state.gradientsList.length);
-    changeBackgroundGradient(state.gradientsList[state.idx]);
-  }
-}
-
-// `keyActions` and `changeBackgroundGradientRandomly` use currying--
-// i.e., "translating the evaluation of a function that takes multiple arguments
-// (or a tuple of arguments) into evaluating a sequence of functions, each with
-// a single argument" (Wikipedia).
-// Also see: https://stackoverflow.com/questions/256754/how-to-pass-arguments-to-addeventlistener-listener-function
 
 var keyActions = function(state) {
   return function(event) {
@@ -88,7 +66,7 @@ var keyActions = function(state) {
           clearInterval(state.autoChangeId);
         }
         break;
-      case 'd':
+      case 'ArrowLeft':
         if (state.autoChange) {
           clearInterval(state.autoChangeId);
           state.autoChangeInterval += 200;
@@ -100,7 +78,7 @@ var keyActions = function(state) {
           changeBackgroundGradient(state.gradientsList[state.idx]);
         }
         break;
-      case 'k':
+      case 'ArrowRight':
         if (state.autoChange) {
           clearInterval(state.autoChangeId);
           state.autoChangeInterval -= 200;
@@ -132,6 +110,31 @@ var keyActions = function(state) {
     event.preventDefault();
   }
 }
+
+function changeBackgroundGradient(colorData) {
+  var ctx = document.getElementById('canvas').getContext('2d');
+  var gradient = ctx.createLinearGradient(0, 0, window.innerHeight, window.innerWidth);
+  gradient.addColorStop(0, colorData[0]);
+  gradient.addColorStop(1, colorData[1]);
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+}
+
+
+function changeBackgroundGradientRandomly(state) {
+  return function() {
+    state.idx = getRandomInt(state.gradientsList.length);
+    changeBackgroundGradient(state.gradientsList[state.idx]);
+  }
+}
+
+// `keyActions` and `changeBackgroundGradientRandomly` use currying--
+// i.e., "translating the evaluation of a function that takes multiple arguments
+// (or a tuple of arguments) into evaluating a sequence of functions, each with
+// a single argument" (Wikipedia).
+// Also see: https://stackoverflow.com/questions/256754/how-to-pass-arguments-to-addeventlistener-listener-function
+
+
 
 
 function getRandomInt(max) {
