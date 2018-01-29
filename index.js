@@ -46,7 +46,7 @@ function dealWithColors(data) {
     autoChangeId: null,
     autoChangeInterval: 1200
   };
-  window.addEventListener('keypress', keyActions(state), true);
+  window.addEventListener('keydown', keyActions(state), true);
 }
 
 function changeBackgroundGradient(colorData) {
@@ -91,7 +91,7 @@ var keyActions = function(state) {
       case 'd':
         if (state.autoChange) {
           clearInterval(state.autoChangeId);
-          state.autoChangeInterval -= 100;
+          state.autoChangeInterval += 200;
           state.autoChangeId = setInterval(
             changeBackgroundGradientRandomly(state), state.autoChangeInterval);
         } else {
@@ -101,10 +101,22 @@ var keyActions = function(state) {
         }
         break;
       case 'k':
+        if (state.autoChange) {
+          clearInterval(state.autoChangeId);
+          state.autoChangeInterval -= 200;
+          state.autoChangeId = setInterval(
+            changeBackgroundGradientRandomly(state), state.autoChangeInterval);
+        } else {
+          state.idx += 1;
+          dealWithCornerIndices(state);
+          changeBackgroundGradient(state.gradientsList[state.idx]);
+        }
         break;
       case 'f':
+        // TODO: fade in
         break;
       case 'j':
+        // TODO: fade out
         break;
       case "m":
         changeBackgroundGradient(state.gradientsList[100]);
