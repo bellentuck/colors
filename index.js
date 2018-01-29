@@ -39,11 +39,14 @@ function addColorsEntryToResults(result, colors) {
 
 function dealWithColors(data) {
   var colorsIdx = 0;
-  window.addEventListener("keypress", keyActions(data), true);
-  setInterval(function(){
-    colorsIdx++;
-    changeBackgroundGradient(data[colorsIdx]);
-  }, 3000);
+  var state = {
+    gradientsList: data,
+    idx: 0,
+    autoChange: false,    // use `setInterval` & `clearInterval`
+    autoChangeId: null,
+    autoChangeInterval: 1200
+  };
+  window.addEventListener('keypress', keyActions(state), true);
 }
 
 function changeBackgroundGradient(colorData) {
@@ -56,25 +59,58 @@ function changeBackgroundGradient(colorData) {
 }
 
 
+function changeBackgroundGradientRandomly(state) {
+  return function() {
+    state.idx = getRandomInt(state.gradientsList.length);
+    changeBackgroundGradient(state.gradientsList[state.idx]);
+  }
+}
 
-
-// `keyActions` uses currying--i.e., "translating the evaluation of a function
-// that takes multiple arguments (or a tuple of arguments) into evaluating a
-// sequence of functions, each with a single argument" (Wikipedia).
+// `keyActions` and `changeBackgroundGradientRandomly` use currying--
+// i.e., "translating the evaluation of a function that takes multiple arguments
+// (or a tuple of arguments) into evaluating a sequence of functions, each with
+// a single argument" (Wikipedia).
 // Also see: https://stackoverflow.com/questions/256754/how-to-pass-arguments-to-addeventlistener-listener-function
 
-var keyActions = function(data) {
+var keyActions = function(state) {
   return function(event) {
     if (event.defaultPrevented) {
       return; // Do nothing if the event was already processed
     }
 
     switch (event.key) {
+      case 'a':
+        state.autoChange = !state.autoChange;
+        if (state.autoChange) {
+          state.autoChangeId = setInterval(
+            changeBackgroundGradientRandomly(state), state.autoChangeInterval);
+        } else {
+          clearInterval(state.autoChangeId);
+        }
+        break;
+      case 'd':
+        if (state.autoChange) {
+          clearInterval(state.autoChangeId);
+          state.autoChangeInterval -= 100;
+          state.autoChangeId = setInterval(
+            changeBackgroundGradientRandomly(state), state.autoChangeInterval);
+        } else {
+          state.idx -= 1;
+          dealWithCornerIndices(state);
+          changeBackgroundGradient(state.gradientsList[state.idx]);
+        }
+        break;
+      case 'k':
+        break;
+      case 'f':
+        break;
+      case 'j':
+        break;
       case "m":
-        changeBackgroundGradient(data[100]);
+        changeBackgroundGradient(state.gradientsList[100]);
         break;
       case "n":
-        changeBackgroundGradient(data[101]);
+        changeBackgroundGradient(state.gradientsList[101]);
         break;
       default:
         return; // Quit when this doesn't handle the key event.
@@ -82,5 +118,18 @@ var keyActions = function(data) {
 
     // Cancel the default action to avoid it being handled twice
     event.preventDefault();
+  }
+}
+
+
+function getRandomInt(max) {
+  return Math.floor(Math.random() * Math.floor(max));
+}
+
+function dealWithCornerIndices(state) {
+  if (state.idx >= state.gradientsList.length) {
+    state.idx = 0;
+  } else if (state.idx < 0) {
+    state.idx = state.gradientsList.length - 1;
   }
 }
