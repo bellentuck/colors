@@ -4,4 +4,5 @@ body {
 
 #canvas {
   background: linear-gradient(90deg, #EC6F66 10%, #F3A183 90%);
+  opacity: 1;
 }

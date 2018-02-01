@@ -41,20 +41,65 @@ function dealWithColors(data) {
   var colorsIdx = 0;
   var state = {
     gradientsList: data,
-    idx: 0,
+    idx: 0,        // which index on the list of gradients are we on?
+    //pressedKeys: {},  // which keyboard keys are currently pressed down?
     autoChange: false,    // use `setInterval` & `clearInterval`
     autoChangeId: null,
-    autoChangeInterval: 1200
+    //autoChangeAcceleratorId: null,
+    autoChangeInterval: 1200,
+    timer: null,
+    opacity: 1
   };
-  window.addEventListener('keydown', keyActions(state), true);
+  window.addEventListener('keydown', keyDownActions(state), true);
+  window.addEventListener('keyup', keyUpActions(state), false);
 }
 
 
-var keyActions = function(state) {
+function implementSafetyStandard(state, speed) {
+  state.autoChangeInterval = speed > 130 ? speed : 130;
+}
+
+var keyUpActions = function(state) {
   return function(event) {
     if (event.defaultPrevented) {
       return; // Do nothing if the event was already processed
     }
+    switch (event.key) {
+      case 'ArrowDown':
+        if (state.autoChange) {
+          state.timer = Date.now() - state.timer;
+          let func = changeBackgroundGradientRandomly(state);
+          state.autoChangeInterval *= (1 + 10 / state.timer);
+          clearInterval(state.autoChangeId);
+          state.autoChangeId = setInterval(func, state.autoChangeInterval);
+          state.timer = null;
+        }
+        break;
+      case 'ArrowUp':
+        if (state.autoChange) {
+          state.timer = Date.now() - state.timer;
+          let func = changeBackgroundGradientRandomly(state);
+          let proposedSpeed = state.autoChangeInterval * (1 - 10 / state.timer);
+          implementSafetyStandard(state, proposedSpeed);
+          // state.autoChangeInterval *= (1 - 10 / state.timer);
+          clearInterval(state.autoChangeId);
+          state.autoChangeId = setInterval(func, state.autoChangeInterval);
+          state.timer = null;
+        }
+      default:
+        return;
+    }
+  }
+    event.preventDefault();
+}
+
+var keyDownActions = function(state) {
+  return function(event) {
+    if (event.defaultPrevented) {
+      return; // Do nothing if the event was already processed
+    }
+    // See: https://stackoverflow.com/questions/1828613/check-if-a-key-is-down
+    //state.pressedKeys[event.key] = true;
 
     switch (event.key) {
       case 'a':
@@ -66,35 +111,31 @@ var keyActions = function(state) {
           clearInterval(state.autoChangeId);
         }
         break;
-      case 'ArrowLeft':
+      case 'ArrowDown':
         if (state.autoChange) {
-          clearInterval(state.autoChangeId);
-          state.autoChangeInterval += 200;
-          state.autoChangeId = setInterval(
-            changeBackgroundGradientRandomly(state), state.autoChangeInterval);
+          state.timer = Date.now();
         } else {
           state.idx -= 1;
           dealWithCornerIndices(state);
           changeBackgroundGradient(state.gradientsList[state.idx]);
         }
         break;
-      case 'ArrowRight':
+      case 'ArrowUp':
         if (state.autoChange) {
-          clearInterval(state.autoChangeId);
-          state.autoChangeInterval -= 200;
-          state.autoChangeId = setInterval(
-            changeBackgroundGradientRandomly(state), state.autoChangeInterval);
+          state.timer = Date.now();
         } else {
           state.idx += 1;
           dealWithCornerIndices(state);
           changeBackgroundGradient(state.gradientsList[state.idx]);
         }
         break;
-      case 'f':
-        // TODO: fade in
+      case 'ArrowRight': // make more opaque
+        state.opacity = state.opacity < .1 ? state.opacity : state.opacity - .04;
+        document.getElementById('canvas').style.opacity = state.opacity;
         break;
-      case 'j':
-        // TODO: fade out
+      case 'ArrowLeft': // make less opaque
+        state.opacity = state.opacity > .9 ? state.opacity : state.opacity + .04;
+        document.getElementById('canvas').style.opacity = state.opacity;
         break;
       case "m":
         changeBackgroundGradient(state.gradientsList[100]);
