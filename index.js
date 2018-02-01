@@ -45,10 +45,13 @@ function dealWithColors(data) {
     //pressedKeys: {},  // which keyboard keys are currently pressed down?
     autoChange: false,    // use `setInterval` & `clearInterval`
     autoChangeId: null,
-    //autoChangeAcceleratorId: null,
-    autoChangeInterval: 1200,
+    autoDrawIds: [],
+    autoChangeInterval: 3980,
     timer: null,
-    opacity: 1
+    opacity: 1,
+    activeCurves: {
+      sine: false
+    }
   };
   window.addEventListener('keydown', keyDownActions(state), true);
   window.addEventListener('keyup', keyUpActions(state), false);
@@ -69,7 +72,7 @@ var keyUpActions = function(state) {
         if (state.autoChange) {
           state.timer = Date.now() - state.timer;
           let func = changeBackgroundGradientRandomly(state);
-          state.autoChangeInterval *= (1 + 10 / state.timer);
+          state.autoChangeInterval *= (1 + 20 / state.timer);
           clearInterval(state.autoChangeId);
           state.autoChangeId = setInterval(func, state.autoChangeInterval);
           state.timer = null;
@@ -79,7 +82,7 @@ var keyUpActions = function(state) {
         if (state.autoChange) {
           state.timer = Date.now() - state.timer;
           let func = changeBackgroundGradientRandomly(state);
-          let proposedSpeed = state.autoChangeInterval * (1 - 10 / state.timer);
+          let proposedSpeed = state.autoChangeInterval * (1 - 20 / state.timer);
           implementSafetyStandard(state, proposedSpeed);
           // state.autoChangeInterval *= (1 - 10 / state.timer);
           clearInterval(state.autoChangeId);
@@ -130,18 +133,27 @@ var keyDownActions = function(state) {
         }
         break;
       case 'ArrowRight': // make more opaque
-        state.opacity = state.opacity < .1 ? state.opacity : state.opacity - .04;
+        state.opacity = state.opacity < .04 ? state.opacity : state.opacity - .04;
         document.getElementById('canvas').style.opacity = state.opacity;
         break;
       case 'ArrowLeft': // make less opaque
         state.opacity = state.opacity > .9 ? state.opacity : state.opacity + .04;
         document.getElementById('canvas').style.opacity = state.opacity;
         break;
-      case "m":
-        changeBackgroundGradient(state.gradientsList[100]);
-        break;
-      case "n":
-        changeBackgroundGradient(state.gradientsList[101]);
+      case "s":
+        // create sine wave
+        if (!state.activeCurves.sine) {
+          state.autoDrawIds.push(setInterval(OnDraw(.1,2), 100));
+          state.autoDrawIds.push(setInterval(OnDraw(.3), 200));
+          state.autoDrawIds.push(setInterval(OnDraw(.5,2), 300));
+          state.autoDrawIds.push(setInterval(OnDraw(.7), 400));
+          state.autoDrawIds.push(setInterval(OnDraw(.9,2), 500));
+          state.activeCurves.sine = true;
+        } else {
+          clearInterval(state.autoDrawIds.shift());
+          if (state.autoDrawIds.length === 0) state.activeCurves.sine = false;
+        }
+        //state.activeCurves.sine = !state.activeCurves.sine;
         break;
       default:
         return; // Quit when this doesn't handle the key event.
@@ -189,3 +201,36 @@ function dealWithCornerIndices(state) {
     state.idx = state.gradientsList.length - 1;
   }
 }
+
+
+
+// sinewaves
+
+            var time = 0;
+			var color = "#D0B1C3";
+
+			function OnDraw(direction="left", relHeight=0.5, shakinessFactor=2, period=0.05, amplitude=200) {
+        return function() {
+  				time = time + 0.2;
+  				var canvas = document.getElementById("canvas");
+  				var dataLine = canvas.getContext("2d");
+  			  //var value = document.getElementById("lineWidth");
+
+  				//dataLine.clearRect(0, 0, canvas.width, canvas.height);
+  				dataLine.beginPath();
+  				<!-- dataLine.moveTo(0, canvas.height * relHeight); -->
+          if (direction === "left") {
+    				for(cnt = -1; cnt <= canvas.width; cnt++) {
+    					dataLine.lineTo(cnt, canvas.height * relHeight - (Math.random() * shakinessFactor + Math.cos(time + cnt * period) * amplitude ));
+    				}
+          } else {
+            for(cnt = -1; cnt <= canvas.width; cnt++) {
+              dataLine.lineTo(cnt, canvas.height * relHeight - (Math.random() * shakinessFactor + Math.cos(time - cnt * period) * amplitude ));
+    				}
+          }
+
+  				dataLine.lineWidth = 1;
+  				dataLine.strokeStyle = color;
+  				dataLine.stroke();
+        }
+			}
