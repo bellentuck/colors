@@ -209,7 +209,7 @@ function dealWithCornerIndices(state) {
             var time = 0;
 			var color = "#D0B1C3";
 
-			function OnDraw(direction="left", relHeight=0.5, shakinessFactor=2, period=0.05, amplitude=200) {
+			function OnDraw(relHeight=0.5, shakinessFactor=2, period=0.05, amplitude=200, direction="left") {
         return function() {
   				time = time + 0.2;
   				var canvas = document.getElementById("canvas");
