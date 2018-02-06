@@ -43,10 +43,13 @@ function dealWithColors(data) {
     gradientsList: data,
     idx: 0,        // which index on the list of gradients are we on?
     //pressedKeys: {},  // which keyboard keys are currently pressed down?
+
+    // auto - info
     autoChange: false,    // use `setInterval` & `clearInterval`
     autoChangeId: null,
     autoDrawIds: [],
     autoChangeInterval: 3980,
+
     timer: null,
     opacity: 1,
     activeCurves: {
@@ -164,6 +167,7 @@ var keyDownActions = function(state) {
   }
 }
 
+  // Create New Gradient (should be a constructor or factory)
 function changeBackgroundGradient(colorData) {
   var ctx = document.getElementById('canvas').getContext('2d');
   var gradient = ctx.createLinearGradient(0, 0, window.innerHeight, window.innerWidth);
@@ -234,3 +238,38 @@ function dealWithCornerIndices(state) {
   				dataLine.stroke();
         }
 			}
+
+
+
+
+function (tellabeeyouappreciateitsvitalty) {
+  return new Promise(function(resolve, reject) {
+    `
+    display the first message to a bee that goes, One Time, sawuinthemeantime, tween time,
+    i missed yr honey heys, missed yr days, sonyphase, pony haze pohny glase glazse all about that phony glaze that pony made the trophy wade that motive-ade that growful ford it all to syncopated weatthins.
+    syncopated weatthins.
+    i always remember when you taught me how to twist my wings without breaking a ledge over ledger of doubt in my flying, of course they worked, the sky over what i had feared would occur was a trophy itself.
+    and in this physical domain of our passings I think that perhaps I started to realize I needed you and your buzz in a way a flower needed you to become it was that essential of a gamble,
+    taken cause, idiosyncrasy, type. and off we created a delightful dare, to be what we could be and nothing less.
+    `
+  });
+}
+
+
+//
+//
+// function (message="tellabeeyouappreciateitsvitalty", time=new Date()) {
+//   if (message == "tellabeeyouappreciateitsvitalty") {
+//     (function () {
+//       setTimeout(tellabeeyouappreciateitsvitalty, 0);
+//     })();
+//   }
+// }
+//
+// function tellabeeyouappreciateitsvitalty() {
+//
+// }
+//
+//
+//
+//
